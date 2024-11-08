@@ -3,7 +3,10 @@
 import dotenv from 'dotenv'; // Asegúrate de importar dotenv
 import { createClient } from '@supabase/supabase-js';
 
-dotenv.config(); // Carga las variables de entorno
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config();
+  }
+  
 
 const supabaseUrl = 'https://daavmqheycjwoipjmexk.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY; // Obtiene la clave de Supabase
