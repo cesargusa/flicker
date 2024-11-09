@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import userRegisterRoutes from './api/routes/userRegisterRoutes.js';
 import userLoginRoutes from './api/routes/userLoginRoutes.js';
+import cors from 'cors'; 
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config(); // Solo cargar dotenv en desarrollo
@@ -13,6 +14,7 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Configura las rutas
