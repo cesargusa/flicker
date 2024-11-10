@@ -36,11 +36,12 @@ if (companyError) {
   const token = jwt.sign(
     { id: userData.id, email: userData.email, role: userData.role ,companyImage : companyData.urlCompanyImage},
     SECRET_KEY,
-    { expiresIn: '1m' }
+    { expiresIn: '1h' }
   );
 
   process.env.TOKEN = token;
   process.env.ROLE = userData.role;
+  process.env.USER_ID = userData.id;
   res.status(200).json({ user: userData, token ,companyImage : companyData.urlCompanyImage});
 });
 

@@ -7,7 +7,7 @@ const router = Router(); // Crea una instancia del enrutador
 
 // Ruta para obtener usuarios
 router.get('/', async (req, res) => {
-  if((req.headers.authorization?.split(' ')[1] != undefined && req.headers.authorization?.split(' ')[1] != '') && req.headers.authorization?.split(' ')[1] == process.env.TOKEN && process.env.ROLE == 1 ){
+  if((req.headers.authorization?.split(' ')[1] != undefined && req.headers.authorization?.split(' ')[1] != '') && req.headers.authorization?.split(' ')[1] == process.env.TOKEN && (process.env.ROLE == 'ADMIN' || process.env.ROLE == 'SUPER_ADMIN') ){
     const { data, error } = await supabase.from('dbo.users').select('*');
 
     if (error) {

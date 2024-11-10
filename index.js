@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import userRegisterRoutes from './api/routes/userRegisterRoutes.js';
 import userLoginRoutes from './api/routes/userLoginRoutes.js';
+import bondRoutes from './api/routes/bondRoutes.js';
+
 import cors from 'cors';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -20,6 +22,7 @@ app.use(express.json());
 // Configura las rutas
 app.use('/users/users', userRegisterRoutes);
 app.use('/users/usersLogin', userLoginRoutes);
+app.use('/bonds', bondRoutes);
 
 // Configura el puerto (si estás en local puedes usar un puerto como 3000)
 const PORT = process.env.PORT || 3000;  // Usa el puerto definido en .env o 3000 por defecto
