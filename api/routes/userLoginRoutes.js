@@ -7,26 +7,41 @@ const SECRET_KEY = process.env.SUPABASE_KEY
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  const { data: userData, error } = await supabase
-    .from('dbo.users')
-    .select('id, email, role')
-    .eq('email', email)
-    .eq('password', password) // Nota: En producción, usa una contraseña encriptada
-    .single();
+  const { data: userData, error: userError } = await supabase
+  .from('dbo.users')
+  .select('id, email, role, companyAdminId') // Solo seleccionamos los campos relevantes
+  .eq('email', email)
+  .eq('password', password)  // Recuerda usar contraseñas encriptadas en producción
+  .single();
 
-  if (error || !userData) {
-    return res.status(401).json({ error: 'Credenciales inválidas' });
-  }
+if (userError) {
+  console.log('Error al obtener los datos del usuario:', userError);
+  return;
+}
+
+const { data: companyData, error: companyError } = await supabase
+  .from('dbo.company')
+  .select('urlCompanyImage')
+  .eq('id', userData.companyAdminId)  // Usamos el companyAdminId obtenido del usuario
+  .single();
+  console.log('Usuario:', companyData);
+
+if (companyError) {
+  console.log('Error al obtener los datos de la empresa:', companyError);
+  return;
+}
+
+
 
   const token = jwt.sign(
-    { id: userData.id, email: userData.email, role: userData.role },
+    { id: userData.id, email: userData.email, role: userData.role ,companyImage : companyData.urlCompanyImage},
     SECRET_KEY,
-    { expiresIn: '1h' }
+    { expiresIn: '1m' }
   );
 
   process.env.TOKEN = token;
   process.env.ROLE = userData.role;
-  res.status(200).json({ user: userData, token, role: userData.role });
+  res.status(200).json({ user: userData, token ,companyImage : companyData.urlCompanyImage});
 });
 
 router.get('/closeSession', (req, res) => {
