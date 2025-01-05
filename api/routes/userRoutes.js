@@ -18,21 +18,6 @@ if (userError) {
   console.log('Error al obtener los datos del usuario:', userError);
   return;
 }
-
-// const { data: companyData, error: companyError } = await supabase
-//   .from('dbo.company')
-//   .select('urlCompanyImage')
-//   .eq('id', userData.companyAdminId)  // Usamos el companyAdminId obtenido del usuario
-//   .single();
-//   console.log('Usuario:', companyData);
-
-// if (companyError) {
-//   console.log('Error al obtener los datos de la empresa:', companyError);
-//   return;
-// }
-
-
-
   const token = jwt.sign(
     { id: userData.id, email: userData.email, role: userData.role },
     SECRET_KEY,
@@ -112,11 +97,11 @@ router.get('/', async (req, res) => {
     }
   });
   
-  router.get('/GetDashboard', async (req, res) => {
+  router.post('/GetDashboard', async (req, res) => {
     try {
         const authToken = req.headers.authorization?.split(' ')[1];
         const { currentUserId } = req.body;
-
+console.log(currentUserId)
         if (
             authToken &&
             authToken === process.env.TOKEN &&
