@@ -39,5 +39,17 @@ router.get('/', async (req, res) => {
     return res.status(401).json({ message: "Error de token" });
   }
 });
-
+  // Ruta para insertar un nuevo usuario
+  router.post('/', async (req, res) => {
+    const {isLiked ,idUserFather, idUserSon, attractivePoint, funnyPoint} = req.body;
+    const { data, error } = await supabase
+      .from('dbo.action')
+      .insert([{created_at: new Date(),isLiked , idUserFather,idUserSon, attractivePoint,funnyPoint} ]);
+  
+    if (error) {
+      console.log(error)
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(201).json(data);
+  });
 export default router;

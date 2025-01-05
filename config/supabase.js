@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
   }
   
 
-const supabaseUrl = 'https://daavmqheycjwoipjmexk.supabase.co';
+const supabaseUrl = 'https://vrrgusfrgazctcldrryo.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY; // Obtiene la clave de Supabase
 
 // Comprueba si supabaseKey está definido
