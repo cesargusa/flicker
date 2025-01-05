@@ -99,59 +99,50 @@ router.get('/', async (req, res) => {
   
   router.post('/GetDashboard', async (req, res) => {
     try {
-        const authToken = req.headers.authorization?.split(' ')[1];
-        const { currentUserId } = req.body;
-console.log(currentUserId)
-        if (
-            authToken &&
-            authToken === process.env.TOKEN &&
-            (process.env.ROLE === 'ADMIN' || process.env.ROLE === 'SUPER_ADMIN' || process.env.ROLE === 'USER')
-        ) {
-            // Primera consulta: Obtener usuarios excluyendo el currentUserId
-            const { data: usersData, error: usersError } = await supabase
-                .from('dbo.user')
-                .select('*')
-                .not('id', 'eq', currentUserId); // Excluir el ID del usuario que consulta
-
-            if (usersError) {
-                return res.status(400).json({ error: usersError.message });
-            }
-
-            // Segunda consulta: Obtener acciones donde idUserSon coincida con currentUserId
-            const { data: actionsData, error: actionsError } = await supabase
-                .from('dbo.action')
-                .select('*')
-                .eq('idUserSon', currentUserId);
-
-            if (actionsError) {
-                return res.status(400).json({ error: actionsError.message });
-            }
-
-            // Calcular la media de attractivePoint para cada id en actionsData
-            const actionsById = actionsData.reduce((acc, action) => {
-                if (!acc[action.id]) {
-                    acc[action.id] = { total: 0, count: 0 };
-                }
-                acc[action.id].total += action.attractivePoint;
-                acc[action.id].count += 1;
-                return acc;
-            }, {});
-
-            const options = Object.keys(actionsById).map(id => ({
-                id,
-                averageAttractivePoint: actionsById[id].total / actionsById[id].count
-            }));
-
-            // Responder con los datos de usuarios, acciones y las medias calculadas
-            res.status(200).json({ users: usersData, actions: actionsData, options });
-        } else {
-            res.status(401).json({ message: 'Error token' });
+      const authToken = req.headers.authorization?.split(' ')[1];
+      const { currentUserId } = req.body;
+      console.log(currentUserId);
+  
+      if (
+        authToken &&
+        authToken === process.env.TOKEN &&
+        (process.env.ROLE === 'ADMIN' || process.env.ROLE === 'SUPER_ADMIN' || process.env.ROLE === 'USER')
+      ) {
+        // Primera consulta: Obtener usuarios donde id sea igual al currentUserId
+        const { data: usersData, error: usersError } = await supabase
+          .from('dbo.user')
+          .select('*')
+          .eq('id', currentUserId);
+  
+        if (usersError) {
+          return res.status(400).json({ error: usersError.message });
         }
+  
+        // Segunda consulta: Obtener acciones donde idUserSon coincida con currentUserId
+        const { data: actionsData, error: actionsError } = await supabase
+          .from('dbo.action')
+          .select('*')
+          .eq('idUserSon', currentUserId);
+  
+        if (actionsError) {
+          return res.status(400).json({ error: actionsError.message });
+        }
+  
+        // Calcular la media global de attractivePoint para todas las acciones
+        const totalAttractivePoints = actionsData.reduce((total, action) => total + action.attractivePoint, 0);
+        const averageAttractivePoint = actionsData.length > 0 ? totalAttractivePoints / actionsData.length : 0;
+  
+        // Responder con los datos de usuarios, acciones y la media calculada
+        res.status(200).json({ users: usersData, actions: actionsData, averageAttractivePoint });
+      } else {
+        res.status(401).json({ message: 'Error token' });
+      }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
     }
-});
+  });
+  
 
   
 export default router;
